@@ -47,12 +47,6 @@ app.use(
 
 app.use(passUserToView); // use new passUserToView middleware here
 
-app.get('/', (req, res) => {
-  res.render('index.ejs', {
-    user: req.session.user,
-  });
-});
-
 app.use('/auth', authController);
 app.use(isSignedIn); // use new isSignedIn middleware here
 
@@ -60,10 +54,12 @@ app.use(isSignedIn); // use new isSignedIn middleware here
 app.use(passUserToView); 
 
 
-app.get('/', (req, res) => {
-  res.render('index.ejs', {
-    user: req.session.user,
-  });
+app.get('/', async (req, res) => {
+  if (req.session.user) {
+    res.redirect(`/users/${req.session.user._id}/applications`);
+  } else {
+  res.render('index.ejs');
+}
 });
 
 
@@ -71,6 +67,7 @@ app.get('/', (req, res) => {
 app.use('/auth', authController);
 app.use(isSignedIn);
 app.use('/users/:userId/applications', applicationsController); 
+
 
 app.listen(port, () => {
   console.log(`The express app is ready on port ${port}!`);
